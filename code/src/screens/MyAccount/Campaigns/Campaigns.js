@@ -384,6 +384,11 @@ export const MyCampaigns = () => {
 								justifyContent="space-between"
 								alignItems="center"
 								space="md"
+								borderBottomWidth="$1" 
+								borderBottomColor={colorMode === 'light' ? theme['colors']['coolGray']['200'] : theme['colors']['coolGray']['500']} 
+								pl="$4" 
+								pr="$5" 
+								py="$2"
 							>
 								<Text flex={2}>
 									{String(item.name || '')}
