@@ -131,6 +131,7 @@ export const SelfCheckOut = () => {
                                         setIsOpen(true);
                                    } else {
                                         let tmp = result.itemData;
+                                        tmp.completionMessage = result.completionMessage ?? null;
                                         let updatedSession = _.concat(tmp, items);
                                         //console.log(tmp);
                                         //setItems(tmp);
@@ -208,15 +209,19 @@ export const SelfCheckOut = () => {
                let title = item?.title ?? getTermFromDictionary(language, 'unknown_title');
                let barcode = item?.barcode ?? '';
                let dueDate = item?.due ?? '';
+               let completionMessage = item?.completionMessage ?? '';
                return (
-                    <HStack space="md" justifyContent="space-between">
-                         <Text fontSize="$xs" w="70%" color={textColor}>
-                              <Text bold color={textColor}>{title}</Text> ({barcode})
-                         </Text>
-                         <Text fontSize="$xs" w="25%" color={textColor}>
-                              {dueDate}
-                         </Text>
-                    </HStack>
+                   <>
+                         <HStack space="md" justifyContent="space-between">
+                              <Text fontSize="$xs" w="70%" color={textColor}>
+                                   <Text bold color={textColor}>{title}</Text> ({barcode})
+                              </Text>
+                              <Text fontSize="$xs" w="25%" color={textColor}>
+                                   {dueDate}
+                              </Text>
+                         </HStack>
+                         {completionMessage !== '' ? (<Text color={textColor}>{completionMessage}</Text>) : null}
+                   </>
                );
           }
           return null;
@@ -229,7 +234,7 @@ export const SelfCheckOut = () => {
      const currentCheckOutFooter = () => {};
 
      return (
-          <Box p="$5" w="100%">
+          <Box p="$5" w="100%" style={{ flex: 1 }}>
                <Center pb="$5">
                     {activeAccount?.displayName ? (
                          <Text pb="$3" color={textColor}>
@@ -303,6 +308,9 @@ export const SelfCheckOut = () => {
                <Heading size="md" pb="$2" color={textColor}>
                     {getTermFromDictionary(language, 'checked_out_during_session')}
                </Heading>
+               <Center>
+                    <Text pb="$5" color={textColor}>{completionMessage}</Text>
+               </Center>
                {isProcessingCheckout ? (
                    <Center>
                         <Text pb="$5" color={textColor}>{getTermFromDictionary(language, 'processing_checkout_message')}</Text>
