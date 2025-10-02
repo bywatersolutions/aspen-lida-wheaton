@@ -22,7 +22,8 @@ import {
      VStack, ModalBackdrop, CloseIcon, ModalBody, InputIcon, InputSlot,
 } from '@gluestack-ui/themed';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, Dimensions, KeyboardAvoidingView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PermissionsPrompt } from '../../components/PermissionsPrompt';
 
 // custom components and helper files
@@ -37,6 +38,8 @@ export const SelectYourLibrary = (payload) => {
      const { theme, textColor, colorMode } = React.useContext(ThemeContext);
      const { isCommunity, showModal, setShowModal, updateSelectedLibrary, selectedLibrary, shouldRequestPermissions, permissionRequested, libraries, allLibraries, setShouldRequestPermissions } = payload;
      const [query, setQuery] = React.useState('');
+     const screenHeight = Dimensions.get('window').height;
+     const insets = useSafeAreaInsets();
 
 	 if (libraries.length == 0 && allLibraries.length == 0)
 	 {
@@ -85,15 +88,23 @@ export const SelectYourLibrary = (payload) => {
           setQuery('');
      };
 
+     const filteredLibraries = FilteredLibraries(libraries);
+
      return (
           <Center>
                <Button onPress={() => setShowModal(true)} m="$5" size="md" bgColor={theme['colors']['primary']['500']}>
                     <ButtonIcon as={MaterialIcons} name="place" mr="$1" color={theme['colors']['primary']['500-text']} />
                     <ButtonText color={theme['colors']['primary']['500-text']}>{selectedLibrary?.name ? selectedLibrary.name : getTermFromDictionary('en', 'select_your_library')}</ButtonText>
                </Button>
-               <Modal isOpen={showModal} size="lg" avoidKeyboard onClose={() => setShowModal(false)} pb={Platform.OS === 'android' && isKeyboardOpen ? '50%' : '0'}>
+               <Modal isOpen={showModal} size="lg" avoidKeyboard onClose={() => setShowModal(false)}>
                     <ModalBackdrop />
-                    <ModalContent bgColor={colorMode === 'light' ? theme['colors']['warmGray']['50'] : theme['colors']['coolGray']['700']} maxH="350">
+                    <ModalContent
+                         bgColor={colorMode === 'light' ? theme['colors']['warmGray']['50'] : theme['colors']['coolGray']['700']}
+                         h={filteredLibraries.length === 0 ? "auto" : isKeyboardOpen ? "65%" : "80%"}
+                         maxH={filteredLibraries.length === 0 ? "400" : isKeyboardOpen ? "65%" : "80%"}
+                         marginTop={isKeyboardOpen ? insets.top + 16 : "auto"}
+                         marginBottom={isKeyboardOpen ? "auto" : "auto"}
+                    >
                          <ModalHeader borderBottomWidth="$1" borderBottomColor={colorMode === 'light' ? theme['colors']['warmGray']['300'] : theme['colors']['coolGray']['500']}>
                               <Heading size="md" color={textColor}>{getTermFromDictionary('en', 'find_your_library')}</Heading>
                               <ModalCloseButton hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}>
@@ -104,20 +115,30 @@ export const SelectYourLibrary = (payload) => {
                          <Box bgColor={colorMode === 'light' ? theme['colors']['warmGray']['50'] : theme['colors']['coolGray']['700']} p="$2" pb={query ? 0 : 5}>
                               <Input borderColor={colorMode === 'light' ? theme['colors']['coolGray']['500'] : theme['colors']['gray']['300']}>
                                    <InputField variant="filled"
-                                               size="$lg"
-                                               autoCorrect={false}
-                                               status="info"
-                                               placeholder={getTermFromDictionary('en', 'search')}
-                                               value={query}
-                                               onChangeText={(text) => setQuery(text)}
-                                               color={textColor}
+                                        size="$lg"
+                                        autoCorrect={false}
+                                        status="info"
+                                        placeholder={getTermFromDictionary('en', 'search')}
+                                        value={query}
+                                        onChangeText={(text) => setQuery(text)}
+                                        color={textColor}
                                    />
                                    {query ? <InputSlot onPress={() => clearSearch()}>
                                         <InputIcon as={MaterialCommunityIcons} name="close-circle" mr="$2" color={textColor} />
                                    </InputSlot> : null}
                               </Input>
                          </Box>
-                         <FlatList keyboardShouldPersistTaps="handled" keyExtractor={(item, index) => index.toString()} renderItem={({ item }) => <Item data={item} isCommunity={isCommunity} setShowModal={setShowModal} updateSelectedLibrary={updateSelectedLibrary} textColor={textColor} colorMode={colorMode} theme={theme} />} data={FilteredLibraries(libraries)} />
+                         <FlatList
+                              keyboardShouldPersistTaps="handled"
+                              keyExtractor={(item, index) => index.toString()}
+                              renderItem={({ item }) => <Item data={item} isCommunity={isCommunity} setShowModal={setShowModal} updateSelectedLibrary={updateSelectedLibrary} textColor={textColor} colorMode={colorMode} theme={theme} />}
+                              data={filteredLibraries}
+                              flex={filteredLibraries.length === 0 ? 0 : 1}
+                              showsVerticalScrollIndicator={true}
+                              contentContainerStyle={{
+                                   paddingBottom: Platform.OS === 'android' ? insets.bottom : 16
+                              }}
+                         />
                          </ModalBody>
                     </ModalContent>
                </Modal>
