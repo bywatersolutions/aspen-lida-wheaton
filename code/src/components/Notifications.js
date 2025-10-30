@@ -14,7 +14,7 @@ import { createAuthTokens, getHeaders, postData, problemCodeMap, stripHTML } fro
 import { GLOBALS } from '../util/globals';
 import { popAlert, popToast } from './loadError';
 
-import { logDebugMessage, logInfoMessage, logWarnMessage, logErrorMessage } from '../util/logging.js';
+import { logDebugMessage, logInfoMessage, logWarnMessage, logErrorMessage, logSentryMessage } from '../util/logging.js';
 
 export async function registerForPushNotificationsAsync(url) {
      try {
@@ -41,7 +41,7 @@ export async function registerForPushNotificationsAsync(url) {
           }
 
           if (finalStatus !== 'granted') {
-               logWarnMessage('Failed to get push notification permissions');
+               logErrorMessage('Failed to get push notification permissions');
                return false;
           }
 
@@ -74,6 +74,10 @@ export async function savePushToken(url, pushToken) {
           auth: createAuthTokens(),
      });
      const response = await api.post('/UserAPI?method=saveNotificationPushToken', postBody);
+     if(!response.ok) {
+            logErrorMessage("Could not save push token");
+            logDebugMessage(response);
+     }
      return response.ok;
 }
 
@@ -90,6 +94,8 @@ export async function getPushToken(libraryUrl) {
           if (response.data.result.success) {
                return response.data.result.tokens;
           } else {
+                logWarnMessage("No push tokens found");
+                logDebugMessage(response);
                return [];
           }
      } else {
@@ -109,6 +115,10 @@ export async function deletePushToken(libraryUrl, pushToken, shouldAlert = false
           auth: createAuthTokens(),
      });
      const response = await api.post('/UserAPI?method=deleteNotificationPushToken', postBody);
+     if(!response.ok) {
+          logErrorMessage("Could not delete push token");
+          logDebugMessage(response);
+     }
      return response.ok;
 }
 

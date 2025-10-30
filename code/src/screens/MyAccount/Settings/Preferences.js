@@ -11,6 +11,7 @@ import { LanguageContext, LibraryBranchContext, LibrarySystemContext, UserContex
 import { navigate } from '../../../helpers/RootNavigator';
 import { UseColorMode } from '../../../themes/theme';
 import { getTermFromDictionary, LanguageSwitcher } from '../../../translations/TranslationService';
+import { logErrorMessage } from '../../../util/logging';
 
 export const PreferencesScreen = () => {
      const navigation = useNavigation();
@@ -22,19 +23,23 @@ export const PreferencesScreen = () => {
      React.useEffect(() => {
           const updateTokens = navigation.addListener('focus', async () => {
                if (Constants.isDevice) {
-                    const token = (
-                         await Notifications.getExpoPushTokenAsync({
-                              projectId: Constants.expoConfig.extra.eas.projectId,
-                         })
-                    ).data;
-                    if (token) {
-                         if (!_.isEmpty(user.notification_preferences)) {
-                              const tokenStorage = user.notification_preferences;
-                              if (_.find(tokenStorage, _.matchesProperty('token', token))) {
-                                   updateAspenToken(true);
-                                   updateExpoToken(token);
+                    try {
+                         const token = (
+                              await Notifications.getExpoPushTokenAsync({
+                                   projectId: Constants.expoConfig.extra.eas.projectId,
+                              })
+                         ).data;
+                         if (token) {
+                              if (!_.isEmpty(user.notification_preferences)) {
+                                   const tokenStorage = user.notification_preferences;
+                                   if (_.find(tokenStorage, _.matchesProperty('token', token))) {
+                                        updateAspenToken(true);
+                                        updateExpoToken(token);
+                                   }
                               }
                          }
+                    } catch (error) {
+                         logErrorMessage('Error fetching Expo push token:', error);
                     }
                }
           });

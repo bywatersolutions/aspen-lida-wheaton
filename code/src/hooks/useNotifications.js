@@ -5,6 +5,7 @@ import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import _ from 'lodash';
 import { createChannelsAndCategories, deletePushToken, getNotificationPreference, registerForPushNotificationsAsync, savePushToken, setNotificationPreference } from '../components/Notifications';
+import { logSentryMessage, logWarnMessage } from '../util/logging';
 
 // Configure default notification behavior
 Notifications.setNotificationHandler({
@@ -41,8 +42,8 @@ export const useNotificationPermissions = (library, user, updateExpoToken, updat
             }
             return isGranted;
         } catch (error) {
-            console.error('Error checking permissions:', error);
-            return false;
+             logSentryMessage('Error checking permissions:', error);
+             return false;
         }
     };
 
@@ -128,7 +129,7 @@ export const useNotificationPermissions = (library, user, updateExpoToken, updat
             }
             return false;
         } catch (error) {
-            console.error('Error adding notification permissions:', error);
+             logSentryMessage('Error adding notification permissions:', error);
             return false;
         } finally {
             setLoading(false);
@@ -171,12 +172,12 @@ export const useNotificationPermissions = (library, user, updateExpoToken, updat
                     // Try to open app settings directly first
                     await Linking.openSettings();
                 } catch (err) {
-                    console.error('Error opening Android settings:', err);
+                     logSentryMessage('Error opening Android settings:', err);
                     // If that fails, try opening through the system settings
                     try {
                         await Linking.openURL('android-settings://');
                     } catch (secondErr) {
-                        console.error('Failed to open settings through alternative method:', secondErr);
+                         logSentryMessage('Failed to open settings through alternative method:', secondErr);
                     }
                 }
             } else if (Platform.OS === 'ios') {
@@ -194,7 +195,7 @@ export const useNotificationPermissions = (library, user, updateExpoToken, updat
                 }
             });
         } catch (error) {
-            console.error('Error revoking notification permissions:', error);
+             logSentryMessage('Error revoking notification permissions:', error);
             await checkAndUpdatePermissions(true);
         } finally {
             setLoading(false);
@@ -235,7 +236,7 @@ export const useNotificationPreferences = (library, expoToken) => {
             await setNotificationPreference(library.baseUrl, expoToken, option, value);
             setPreferences(prev => ({ ...prev, [option]: value }));
         } catch (error) {
-            console.error(`Error updating ${option} preference:`, error);
+             logSentryMessage(`Error updating ${option} preference:`, error);
         }
     };
 
@@ -253,7 +254,7 @@ export const useNotificationPreferences = (library, expoToken) => {
                 notifyAccount: account?.allow ?? false,
             });
         } catch (error) {
-            console.error('Error loading notification preferences:', error);
+             logSentryMessage('Error loading notification preferences:', error);
         }
     };
 
