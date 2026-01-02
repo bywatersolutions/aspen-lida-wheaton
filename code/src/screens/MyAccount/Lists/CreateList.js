@@ -280,7 +280,7 @@ const CreateList = (props) => {
                                         isLoadingText={getTermFromDictionary(language, 'creating_list', true)}
                                         onPress={async () => {
                                              setAdding(true);
-                                             await createList(title, description, isPublic, library.baseUrl, addToGroup, '', newGroupName).then(async (res) => {
+                                             await createList(title, description, isPublic, library.baseUrl, addToGroup, nestedGroup, newGroupName).then(async (res) => {
                                                   let status = 'success';
                                                   if (!res.success) {
                                                        status = 'danger';
