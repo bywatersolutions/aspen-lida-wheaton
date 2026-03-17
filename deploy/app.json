@@ -1,0 +1,15 @@
+{
+  "name": "Wheaton Public Library+",
+  "slug": "wheaton",
+  "easId": "42c0e0b9-2ea7-48a5-b2a1-d1b8c8c98211",
+  "reverseDns": "org.aspendiscovery.wheatonlibrary",
+  "discoveryUrl": "https://wheatonlibrary.aspendiscovery.org/",
+  "greenhouseUrl": "https://wheatonlibrary.aspendiscovery.org/",
+  "libraryId": "2",
+  "themeId": "3",
+  "background": "#ffffff",
+  "sentryProject": "aspen-lida-wheaton",
+  "sentryDsn": "https://4e33b23e98fd0c8de9e87b7d6f4e7727@o994439.ingest.us.sentry.io/4508218545143808",
+  "ascAppId": "6737852815",
+  "logLevel": "0"
+}
