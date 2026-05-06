@@ -87,6 +87,12 @@ export const LoadingScreen = () => {
                await createGlueTheme(LIBRARY.url).then((result) => {
                     updateTheme(result);
                     setLoadingTheme(false);
+                    //if we have no library we should set error
+                    //to avoid being stuck on loading screen.
+                    if(LIBRARY.url === null)
+                    {
+                         setHasError(true);
+                    }
                });
           });
 
